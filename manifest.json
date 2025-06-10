@@ -2,7 +2,7 @@
   "name": "Daggerheart Game System",
   "version": "1.0.0",
   "manifest_version": 1,
-  "description": "A comprehensive game system for Critical Role's Daggerheart RPG featuring dual d12 mechanics, Hope/Fear tracking, character sheets, and automation.",
+  "description": "Game system for Daggerheart RPG with dual d12 mechanics, Hope/Fear tracking, and character sheets.",
   "author": "sudeengin",
   "action": {
     "title": "Daggerheart",
