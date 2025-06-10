@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daggerheart - Extension</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #2c1810 100%);
+            color: #f4e4c1;
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+            width: 350px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #8b4513;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            margin: 0;
+            background: linear-gradient(45deg, #ffd700, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status {
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid #8b4513;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .status h2 {
+            color: #ffd700;
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 6px 0;
+            padding: 3px 0;
+            font-size: 0.9rem;
+        }
+
+        .status-label {
+            color: #e6d3b7;
+        }
+
+        .status-value {
+            font-weight: bold;
+        }
+
+        .status-ok { color: #90EE90; }
+        .status-error { color: #FF6B6B; }
+        .status-warning { color: #ffd700; }
+
+        .test-section {
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid #8b4513;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .test-section h2 {
+            color: #ffd700;
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .test-button {
+            background: linear-gradient(145deg, #ff6b35, #ff8c42);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 3px;
+            width: calc(50% - 6px);
+        }
+
+        .test-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(255, 107, 53, 0.4);
+        }
+
+        .test-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #8b4513;
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .log h2 {
+            color: #ffd700;
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: #999;
+            font-size: 0.75rem;
+        }
+
+        .instructions {
+            background: rgba(0, 100, 200, 0.1);
+            border: 1px solid #4a90e2;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+        }
+
+        .instructions h3 {
+            color: #4a90e2;
+            margin: 0 0 8px 0;
+            font-size: 1rem;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            font-size: 0.85rem;
+            color: #e6d3b7;
+            line-height: 1.4;
+        }
+
+        .success-message {
+            background: rgba(144, 238, 144, 0.1);
+            border: 1px solid #90EE90;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .success-message h3 {
+            color: #90EE90;
+            margin: 0 0 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚔️ Daggerheart ⚔️</h1>
+            <p style="margin: 5px 0; color: #ccc; font-size: 0.9rem;">Extension Test v1.0</p>
+        </div>
+
+        <!-- Success Message (hidden initially) -->
+        <div id="successMessage" class="success-message" style="display: none;">
+            <h3>🎉 Extension Connected!</h3>
+            <p>Ready to move to Step 2: Dice System</p>
+        </div>
+
+        <!-- Extension Status -->
+        <div class="status">
+            <h2>Connection Status</h2>
+            <div class="status-item">
+                <span class="status-label">Extension:</span>
+                <span id="extensionStatus" class="status-value status-error">Loading...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">OBR SDK:</span>
+                <span id="obrStatus" class="status-value status-error">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Player:</span>
+                <span id="playerName" class="status-value">Connecting...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Room:</span>
+                <span id="roomStatus" class="status-value status-error">Checking...</span>
+            </div>
+        </div>
+
+        <!-- Test Functions -->
+        <div class="test-section">
+            <h2>Test Functions</h2>
+            <button class="test-button" id="testNotification" disabled>Test Notification</button>
+            <button class="test-button" id="testBroadcast" disabled>Test Message</button>
+            <button class="test-button" id="testMetadata" disabled>Test Save Data</button>
+            <button class="test-button" id="clearLog">Clear Log</button>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="log">
+            <h2>Activity Log</h2>
+            <div id="logEntries">
+                <div class="log-entry">
+                    <span class="log-time">[Starting...]</span> Initializing extension...
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3>✅ Installation Success!</h3>
+            <p><strong>Web server is working correctly.</strong> The CORS errors in the console are normal for Owlbear Rodeo extensions and don't affect functionality.</p>
+            <p><strong>Next:</strong> Once all status indicators are green, we'll move to Step 2: Dice System!</p>
+        </div>
+    </div>
+
+    <script>
+        // Daggerheart Extension - CORS Fixed Version
+        class DaggerheartExtension {
+            constructor() {
+                this.isReady = false;
+                this.playerInfo = null;
+                this.broadcastChannel = null;
+                this.retryCount = 0;
+                this.maxRetries = 5;
+                
+                this.init();
+            }
+
+            async init() {
+                this.log('Extension loading...', 'info');
+                
+                // Wait a moment for the page to fully load
+                await this.delay(500);
+                
+                await this.initializeOBR();
+            }
+
+            async initializeOBR() {
+                try {
+                    // Check if we're in an iframe (Owlbear Rodeo context)
+                    if (window.parent === window) {
+                        this.log('⚠️ Not running in Owlbear Rodeo - testing in standalone mode', 'warning');
+                        this.updateStatus('extensionStatus', 'Standalone Mode', 'warning');
+                        this.enableTestMode();
+                        return;
+                    }
+
+                    // Check if OBR SDK is available
+                    if (typeof OBR === 'undefined') {
+                        this.log('Waiting for OBR SDK...', 'info');
+                        
+                        // Wait for SDK to load
+                        await this.waitForOBR();
+                        
+                        if (typeof OBR === 'undefined') {
+                            throw new Error('OBR SDK failed to load');
+                        }
+                    }
+                    
+                    this.updateStatus('obrStatus', 'Loaded', 'ok');
+                    this.log('OBR SDK loaded successfully', 'success');
+
+                    // Wait for OBR to be ready with timeout
+                    this.log('Connecting to Owlbear Rodeo...', 'info');
+                    
+                    await Promise.race([
+                        OBR.onReady(),
+                        this.timeout(10000, 'OBR ready timeout')
+                    ]);
+                    
+                    this.log('OBR connection established!', 'success');
+                    
+                    // Get player information
+                    this.playerInfo = await OBR.player.getInfo();
+                    this.updateStatus('playerName', this.playerInfo.name, 'ok');
+                    this.updateStatus('roomStatus', 'Connected', 'ok');
+                    this.updateStatus('extensionStatus', 'Connected', 'ok');
+                    
+                    this.log(`Connected as: ${this.playerInfo.name}`, 'success');
+                    
+                    // Setup broadcast channel
+                    this.broadcastChannel = await OBR.broadcast.getChannel('daggerheart-test');
+                    this.log('Communication channel established', 'success');
+                    
+                    // Listen for messages
+                    this.broadcastChannel.onMessage((message) => {
+                        this.log(`📨 Message from ${message.playerName}: ${message.data.text}`, 'info');
+                    });
+                    
+                    this.isReady = true;
+                    this.enableButtons();
+                    this.showSuccessMessage();
+                    this.log('🎉 Extension fully initialized and ready!', 'success');
+                    
+                } catch (error) {
+                    this.retryCount++;
+                    this.log(`❌ Error: ${error.message}`, 'error');
+                    
+                    if (this.retryCount < this.maxRetries) {
+                        this.log(`Retrying... (${this.retryCount}/${this.maxRetries})`, 'warning');
+                        await this.delay(2000);
+                        await this.initializeOBR();
+                    } else {
+                        this.updateStatus('extensionStatus', 'Failed', 'error');
+                        this.log('❌ Maximum retries reached. Extension failed to initialize.', 'error');
+                    }
+                }
+            }
+
+            async waitForOBR() {
+                for (let i = 0; i < 20; i++) {
+                    if (typeof OBR !== 'undefined') return;
+                    await this.delay(250);
+                }
+            }
+
+            async timeout(ms, message) {
+                return new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error(message)), ms);
+                });
+            }
+
+            async delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            enableTestMode() {
+                // Enable buttons for standalone testing
+                this.updateStatus('obrStatus', 'Test Mode', 'warning');
+                this.updateStatus('playerName', 'Test User', 'warning');
+                this.updateStatus('roomStatus', 'Test Mode', 'warning');
+                this.enableButtons();
+                this.log('Running in test mode - limited functionality', 'warning');
+            }
+
+            showSuccessMessage() {
+                document.getElementById('successMessage').style.display = 'block';
+            }
+
+            updateStatus(elementId, text, type = 'normal') {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = text;
+                    element.className = `status-value status-${type}`;
+                }
+            }
+
+            log(message, type = 'info') {
+                const logEntries = document.getElementById('logEntries');
+                const time = new Date().toLocaleTimeString();
+                
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                
+                let color = '#e6d3b7';
+                if (type === 'success') color = '#90EE90';
+                if (type === 'error') color = '#FF6B6B';
+                if (type === 'warning') color = '#ffd700';
+                if (type === 'info') color = '#4a90e2';
+                
+                entry.innerHTML = `
+                    <span class="log-time">[${time}]</span> 
+                    <span style="color: ${color}">${message}</span>
+                `;
+                
+                logEntries.insertBefore(entry, logEntries.firstChild);
+                
+                // Keep only last 15 entries
+                while (logEntries.children.length > 15) {
+                    logEntries.removeChild(logEntries.lastChild);
+                }
+                
+                console.log(`[Daggerheart] ${message}`);
+            }
+
+            enableButtons() {
+                document.getElementById('testNotification').disabled = false;
+                document.getElementById('testBroadcast').disabled = false;
+                document.getElementById('testMetadata').disabled = false;
+            }
+
+            async testNotification() {
+                try {
+                    if (this.isReady && typeof OBR !== 'undefined') {
+                        await OBR.notification.show('🎲 Daggerheart Test', 'Extension working correctly!', 'SUCCESS');
+                        this.log('✅ Notification sent successfully', 'success');
+                    } else {
+                        this.log('📱 Test notification (would show in OBR)', 'info');
+                    }
+                } catch (error) {
+                    this.log(`❌ Notification error: ${error.message}`, 'error');
+                }
+            }
+
+            async testBroadcast() {
+                try {
+                    if (this.isReady && this.broadcastChannel) {
+                        await this.broadcastChannel.sendMessage({
+                            playerName: this.playerInfo.name,
+                            data: {
+                                text: 'Hello from Daggerheart extension!',
+                                timestamp: Date.now()
+                            }
+                        });
+                        this.log('📡 Message broadcast sent', 'success');
+                    } else {
+                        this.log('📡 Test broadcast (would send to other players)', 'info');
+                    }
+                } catch (error) {
+                    this.log(`❌ Broadcast error: ${error.message}`, 'error');
+                }
+            }
+
+            async testMetadata() {
+                try {
+                    if (this.isReady && typeof OBR !== 'undefined') {
+                        const testData = {
+                            version: '1.0.0',
+                            initialized: true,
+                            timestamp: Date.now()
+                        };
+                        
+                        await OBR.room.setMetadata('daggerheart-test', testData);
+                        const retrieved = await OBR.room.getMetadata('daggerheart-test');
+                        
+                        this.log(`💾 Data saved and retrieved: v${retrieved.version}`, 'success');
+                    } else {
+                        this.log('💾 Test save data (would save to room)', 'info');
+                    }
+                } catch (error) {
+                    this.log(`❌ Metadata error: ${error.message}`, 'error');
+                }
+            }
+
+            clearLog() {
+                const logEntries = document.getElementById('logEntries');
+                logEntries.innerHTML = '<div class="log-entry"><span class="log-time">[Cleared]</span> <span style="color: #4a90e2">Log cleared</span></div>';
+            }
+        }
+
+        // Initialize extension
+        let daggerheartExt;
+        
+        // Start initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeExtension);
+        } else {
+            initializeExtension();
+        }
+
+        function initializeExtension() {
+            daggerheartExt = new DaggerheartExtension();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('testNotification')?.addEventListener('click', () => {
+                daggerheartExt?.testNotification();
+            });
+            
+            document.getElementById('testBroadcast')?.addEventListener('click', () => {
+                daggerheartExt?.testBroadcast();
+            });
+            
+            document.getElementById('testMetadata')?.addEventListener('click', () => {
+                daggerheartExt?.testMetadata();
+            });
+            
+            document.getElementById('clearLog')?.addEventListener('click', () => {
+                daggerheartExt?.clearLog();
+            });
+        }
+
+        // Load OBR SDK dynamically if not loaded
+        if (typeof OBR === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://sdk.owlbear.rodeo/1.0.0/obr.js';
+            script.async = true;
+            document.head.appendChild(script);
+        }
+    </script>
+</body>
+</html>
