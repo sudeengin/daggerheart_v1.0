@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daggerheart - Extension</title>
+    <title>Daggerheart - Hybrid Dice System</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #2c1810 100%);
             color: #f4e4c1;
             margin: 0;
-            padding: 15px;
+            padding: 12px;
             min-height: 100vh;
-            width: 350px;
+            width: 380px;
             box-sizing: border-box;
         }
 
         .container {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
-            padding: 20px;
+            padding: 18px;
             border: 2px solid #8b4513;
             backdrop-filter: blur(10px);
         }
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .header h1 {
@@ -38,473 +38,907 @@
             background-clip: text;
         }
 
-        .status {
+        .section {
             background: rgba(139, 69, 19, 0.2);
             border: 1px solid #8b4513;
             border-radius: 8px;
             padding: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
-        .status h2 {
-            color: #ffd700;
-            margin: 0 0 8px 0;
-            font-size: 1.1rem;
-        }
-
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 6px 0;
-            padding: 3px 0;
-            font-size: 0.9rem;
-        }
-
-        .status-label {
-            color: #e6d3b7;
-        }
-
-        .status-value {
-            font-weight: bold;
-        }
-
-        .status-ok { color: #90EE90; }
-        .status-error { color: #FF6B6B; }
-        .status-warning { color: #ffd700; }
-
-        .test-section {
-            background: rgba(139, 69, 19, 0.2);
-            border: 1px solid #8b4513;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 15px;
-        }
-
-        .test-section h2 {
+        .section h2 {
             color: #ffd700;
             margin: 0 0 10px 0;
             font-size: 1.1rem;
         }
 
-        .test-button {
+        /* Hope & Fear Tokens */
+        .token-tracker {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 12px;
+        }
+
+        .token-group {
+            text-align: center;
+        }
+
+        .token-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .token-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .hope-btn { background: #90EE90; }
+        .fear-btn { background: #FF6B6B; }
+
+        .token-count {
+            font-size: 1.4rem;
+            font-weight: bold;
+            min-width: 28px;
+        }
+
+        .hope { color: #90EE90; }
+        .fear { color: #FF6B6B; }
+
+        /* Dice Rolling Options */
+        .dice-mode {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #8b4513;
+            border-radius: 6px;
+            background: rgba(139, 69, 19, 0.3);
+            color: #f4e4c1;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(145deg, #ff6b35, #ff8c42);
+            border-color: #ff6b35;
+            color: white;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: rgba(255, 107, 53, 0.2);
+            border-color: #ff6b35;
+        }
+
+        /* Attribute Selection */
+        .attribute-select {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .attr-btn {
+            padding: 8px 6px;
+            border: 1px solid #8b4513;
+            border-radius: 4px;
+            background: rgba(139, 69, 19, 0.2);
+            color: #f4e4c1;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .attr-btn.selected {
+            background: linear-gradient(145deg, #4a90e2, #5ba3f5);
+            border-color: #4a90e2;
+            color: white;
+        }
+
+        .attr-value {
+            display: block;
+            font-size: 1.1rem;
+            margin-top: 2px;
+        }
+
+        /* Modifier Input */
+        .modifier-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .modifier-input {
+            width: 50px;
+            padding: 6px;
+            border: 2px solid #8b4513;
+            border-radius: 4px;
+            background: rgba(244, 228, 193, 0.1);
+            color: #f4e4c1;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Roll Buttons */
+        .roll-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .roll-btn {
             background: linear-gradient(145deg, #ff6b35, #ff8c42);
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 12px 16px;
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin: 3px;
-            width: calc(50% - 6px);
+            position: relative;
         }
 
-        .test-button:hover {
+        .roll-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
         }
 
-        .test-button:disabled {
+        .roll-btn:disabled {
             background: #666;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
-        .log {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #8b4513;
-            border-radius: 8px;
-            padding: 12px;
-            max-height: 150px;
+        .roll-btn.secondary {
+            background: linear-gradient(145deg, #4a90e2, #5ba3f5);
+            font-size: 0.9rem;
+            padding: 8px 12px;
+        }
+
+        .roll-btn.secondary:hover {
+            box-shadow: 0 3px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        /* Integration Status */
+        .integration-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .status-online { background: #90EE90; }
+        .status-offline { background: #666; }
+
+        /* Roll Results */
+        .roll-results {
+            max-height: 180px;
             overflow-y: auto;
+            border: 1px solid #8b4513;
+            border-radius: 6px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        .log h2 {
-            color: #ffd700;
-            margin: 0 0 8px 0;
-            font-size: 1.1rem;
-        }
-
-        .log-entry {
-            padding: 3px 0;
-            border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+        .roll-result {
+            padding: 8px;
+            margin-bottom: 8px;
+            background: rgba(139, 69, 19, 0.3);
+            border-radius: 4px;
+            border-left: 3px solid #ffd700;
             font-size: 0.85rem;
-            line-height: 1.3;
         }
 
-        .log-entry:last-child {
-            border-bottom: none;
+        .roll-result:last-child {
+            margin-bottom: 0;
         }
 
-        .log-time {
+        .roll-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .player-name {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .roll-time {
             color: #999;
             font-size: 0.75rem;
         }
 
-        .instructions {
-            background: rgba(0, 100, 200, 0.1);
-            border: 1px solid #4a90e2;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 15px;
+        .roll-details {
+            margin-bottom: 4px;
         }
 
-        .instructions h3 {
-            color: #4a90e2;
-            margin: 0 0 8px 0;
-            font-size: 1rem;
+        .dice-values {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 2px;
         }
 
-        .instructions p {
-            margin: 5px 0;
-            font-size: 0.85rem;
-            color: #e6d3b7;
-            line-height: 1.4;
+        .roll-total {
+            font-size: 1.2rem;
+            font-weight: bold;
         }
 
-        .success-message {
-            background: rgba(144, 238, 144, 0.1);
-            border: 1px solid #90EE90;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 15px;
-            text-align: center;
+        .roll-outcome {
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 4px;
         }
 
-        .success-message h3 {
+        .outcome-success {
+            background: rgba(144, 238, 144, 0.3);
             color: #90EE90;
-            margin: 0 0 5px 0;
+        }
+
+        .outcome-partial {
+            background: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+        }
+
+        .outcome-failure {
+            background: rgba(255, 107, 107, 0.3);
+            color: #FF6B6B;
+        }
+
+        .critical {
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .critical-success {
+            color: #90EE90;
+        }
+
+        .critical-failure {
+            color: #FF6B6B;
+        }
+
+        /* Animations */
+        .roll-animate {
+            animation: rollIn 0.5s ease-out;
+        }
+
+        @keyframes rollIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Scrollbar */
+        .roll-results::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .roll-results::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+        }
+
+        .roll-results::-webkit-scrollbar-thumb {
+            background: #8b4513;
+            border-radius: 2px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚔️ Daggerheart ⚔️</h1>
-            <p style="margin: 5px 0; color: #ccc; font-size: 0.9rem;">Extension Test v1.0</p>
+            <h1>⚔️ Daggerheart Dice ⚔️</h1>
+            <p style="margin: 5px 0; color: #ccc; font-size: 0.85rem;">Hybrid System v2.0</p>
         </div>
 
-        <!-- Success Message (hidden initially) -->
-        <div id="successMessage" class="success-message" style="display: none;">
-            <h3>🎉 Extension Connected!</h3>
-            <p>Ready to move to Step 2: Dice System</p>
-        </div>
-
-        <!-- Extension Status -->
-        <div class="status">
-            <h2>Connection Status</h2>
-            <div class="status-item">
-                <span class="status-label">Extension:</span>
-                <span id="extensionStatus" class="status-value status-error">Loading...</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">OBR SDK:</span>
-                <span id="obrStatus" class="status-value status-error">Checking...</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Player:</span>
-                <span id="playerName" class="status-value">Connecting...</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Room:</span>
-                <span id="roomStatus" class="status-value status-error">Checking...</span>
-            </div>
-        </div>
-
-        <!-- Test Functions -->
-        <div class="test-section">
-            <h2>Test Functions</h2>
-            <button class="test-button" id="testNotification" disabled>Test Notification</button>
-            <button class="test-button" id="testBroadcast" disabled>Test Message</button>
-            <button class="test-button" id="testMetadata" disabled>Test Save Data</button>
-            <button class="test-button" id="clearLog">Clear Log</button>
-        </div>
-
-        <!-- Activity Log -->
-        <div class="log">
-            <h2>Activity Log</h2>
-            <div id="logEntries">
-                <div class="log-entry">
-                    <span class="log-time">[Starting...]</span> Initializing extension...
+        <!-- Hope & Fear Tracker -->
+        <div class="section">
+            <h2>Hope & Fear Tokens</h2>
+            <div class="token-tracker">
+                <div class="token-group">
+                    <h3 class="hope" style="margin: 0 0 5px 0; font-size: 0.9rem;">Hope</h3>
+                    <div class="token-controls">
+                        <button class="token-btn hope-btn" id="hopeSubtract">-</button>
+                        <span class="token-count hope" id="hopeCount">0</span>
+                        <button class="token-btn hope-btn" id="hopeAdd">+</button>
+                    </div>
+                </div>
+                <div class="token-group">
+                    <h3 class="fear" style="margin: 0 0 5px 0; font-size: 0.9rem;">Fear</h3>
+                    <div class="token-controls">
+                        <button class="token-btn fear-btn" id="fearSubtract">-</button>
+                        <span class="token-count fear" id="fearCount">0</span>
+                        <button class="token-btn fear-btn" id="fearAdd">+</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Instructions -->
-        <div class="instructions">
-            <h3>✅ Installation Success!</h3>
-            <p><strong>Web server is working correctly.</strong> The CORS errors in the console are normal for Owlbear Rodeo extensions and don't affect functionality.</p>
-            <p><strong>Next:</strong> Once all status indicators are green, we'll move to Step 2: Dice System!</p>
+        <!-- Dice Mode Selection -->
+        <div class="section">
+            <h2>Roll Mode</h2>
+            <div class="dice-mode">
+                <div class="mode-btn active" id="modeBuiltIn">Built-in</div>
+                <div class="mode-btn" id="modeOfficialDice">3D Dice</div>
+                <div class="mode-btn" id="modeDDDice">dddice</div>
+            </div>
+            
+            <!-- Integration Status -->
+            <div class="integration-status">
+                <span>
+                    <span class="status-indicator status-offline" id="statusOfficialDice"></span>
+                    Official Dice: <span id="textOfficialDice">Checking...</span>
+                </span>
+                <span>
+                    <span class="status-indicator status-offline" id="statusDDDice"></span>
+                    dddice: <span id="textDDDice">Checking...</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Attribute Selection -->
+        <div class="section">
+            <h2>Select Attribute</h2>
+            <div class="attribute-select">
+                <div class="attr-btn" data-attr="agility">
+                    AGI<span class="attr-value" id="agiValue">+0</span>
+                </div>
+                <div class="attr-btn" data-attr="strength">
+                    STR<span class="attr-value" id="strValue">+0</span>
+                </div>
+                <div class="attr-btn" data-attr="finesse">
+                    FIN<span class="attr-value" id="finValue">+0</span>
+                </div>
+                <div class="attr-btn" data-attr="instinct">
+                    INS<span class="attr-value" id="insValue">+0</span>
+                </div>
+                <div class="attr-btn" data-attr="presence">
+                    PRE<span class="attr-value" id="preValue">+0</span>
+                </div>
+                <div class="attr-btn" data-attr="knowledge">
+                    KNO<span class="attr-value" id="knoValue">+0</span>
+                </div>
+            </div>
+            
+            <!-- Modifier -->
+            <div class="modifier-section">
+                <label>Additional Modifier:</label>
+                <input type="number" class="modifier-input" id="modifier" value="0" min="-10" max="10">
+            </div>
+        </div>
+
+        <!-- Roll Actions -->
+        <div class="section">
+            <h2>Roll Actions</h2>
+            <div class="roll-section">
+                <button class="roll-btn" id="rollAction">Roll Action (2d12)</button>
+                <button class="roll-btn secondary" id="rollDamage">Roll Damage</button>
+                <button class="roll-btn secondary" id="rollCustom">Custom Roll</button>
+            </div>
+        </div>
+
+        <!-- Roll Results -->
+        <div class="section">
+            <h2>Recent Rolls</h2>
+            <div class="roll-results" id="rollResults">
+                <div class="roll-result">
+                    <div class="roll-header">
+                        <span class="player-name">System</span>
+                        <span class="roll-time">Ready</span>
+                    </div>
+                    <div class="roll-details">Extension loaded! Select an attribute and roll dice.</div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Include Owlbear Rodeo SDK -->
+    <script src="https://sdk.owlbear.rodeo/1.0.0/obr.js"></script>
+    
     <script>
-        // Daggerheart Extension - CORS Fixed Version
-        class DaggerheartExtension {
+        // Daggerheart Hybrid Dice System
+        class DaggerheartHybridDice {
             constructor() {
                 this.isReady = false;
                 this.playerInfo = null;
                 this.broadcastChannel = null;
-                this.retryCount = 0;
-                this.maxRetries = 5;
+                
+                // Game State
+                this.hopeTokens = 0;
+                this.fearTokens = 0;
+                this.selectedAttribute = null;
+                this.selectedAttributeValue = 0;
+                this.currentModifier = 0;
+                this.currentMode = 'builtin';
+                
+                // Attributes (can be customized)
+                this.attributes = {
+                    agility: 0,
+                    strength: 0,
+                    finesse: 0,
+                    instinct: 0,
+                    presence: 0,
+                    knowledge: 0
+                };
+                
+                // Integration Status
+                this.integrations = {
+                    officialDice: false,
+                    dddice: false
+                };
                 
                 this.init();
             }
 
             async init() {
-                this.log('Extension loading...', 'info');
-                
-                // Wait a moment for the page to fully load
-                await this.delay(500);
+                this.log('Initializing Hybrid Dice System...', 'info');
                 
                 await this.initializeOBR();
+                this.setupUI();
+                this.checkIntegrations();
             }
 
             async initializeOBR() {
                 try {
-                    // Check if we're in an iframe (Owlbear Rodeo context)
-                    if (window.parent === window) {
-                        this.log('⚠️ Not running in Owlbear Rodeo - testing in standalone mode', 'warning');
-                        this.updateStatus('extensionStatus', 'Standalone Mode', 'warning');
-                        this.enableTestMode();
-                        return;
-                    }
-
-                    // Check if OBR SDK is available
-                    if (typeof OBR === 'undefined') {
-                        this.log('Waiting for OBR SDK...', 'info');
+                    if (typeof OBR !== 'undefined') {
+                        await OBR.onReady();
+                        this.playerInfo = await OBR.player.getInfo();
+                        this.broadcastChannel = await OBR.broadcast.getChannel('daggerheart-dice');
                         
-                        // Wait for SDK to load
-                        await this.waitForOBR();
+                        // Listen for messages
+                        this.broadcastChannel.onMessage((message) => {
+                            this.handleIncomingMessage(message);
+                        });
                         
-                        if (typeof OBR === 'undefined') {
-                            throw new Error('OBR SDK failed to load');
-                        }
+                        this.isReady = true;
+                        this.log(`Connected as: ${this.playerInfo.name}`, 'success');
                     }
-                    
-                    this.updateStatus('obrStatus', 'Loaded', 'ok');
-                    this.log('OBR SDK loaded successfully', 'success');
-
-                    // Wait for OBR to be ready with timeout
-                    this.log('Connecting to Owlbear Rodeo...', 'info');
-                    
-                    await Promise.race([
-                        OBR.onReady(),
-                        this.timeout(10000, 'OBR ready timeout')
-                    ]);
-                    
-                    this.log('OBR connection established!', 'success');
-                    
-                    // Get player information
-                    this.playerInfo = await OBR.player.getInfo();
-                    this.updateStatus('playerName', this.playerInfo.name, 'ok');
-                    this.updateStatus('roomStatus', 'Connected', 'ok');
-                    this.updateStatus('extensionStatus', 'Connected', 'ok');
-                    
-                    this.log(`Connected as: ${this.playerInfo.name}`, 'success');
-                    
-                    // Setup broadcast channel
-                    this.broadcastChannel = await OBR.broadcast.getChannel('daggerheart-test');
-                    this.log('Communication channel established', 'success');
-                    
-                    // Listen for messages
-                    this.broadcastChannel.onMessage((message) => {
-                        this.log(`📨 Message from ${message.playerName}: ${message.data.text}`, 'info');
-                    });
-                    
-                    this.isReady = true;
-                    this.enableButtons();
-                    this.showSuccessMessage();
-                    this.log('🎉 Extension fully initialized and ready!', 'success');
-                    
                 } catch (error) {
-                    this.retryCount++;
-                    this.log(`❌ Error: ${error.message}`, 'error');
-                    
-                    if (this.retryCount < this.maxRetries) {
-                        this.log(`Retrying... (${this.retryCount}/${this.maxRetries})`, 'warning');
-                        await this.delay(2000);
-                        await this.initializeOBR();
-                    } else {
-                        this.updateStatus('extensionStatus', 'Failed', 'error');
-                        this.log('❌ Maximum retries reached. Extension failed to initialize.', 'error');
+                    this.log(`OBR initialization error: ${error.message}`, 'error');
+                }
+            }
+
+            setupUI() {
+                // Token controls
+                document.getElementById('hopeAdd').addEventListener('click', () => this.changeTokens('hope', 1));
+                document.getElementById('hopeSubtract').addEventListener('click', () => this.changeTokens('hope', -1));
+                document.getElementById('fearAdd').addEventListener('click', () => this.changeTokens('fear', 1));
+                document.getElementById('fearSubtract').addEventListener('click', () => this.changeTokens('fear', -1));
+
+                // Mode selection
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.selectMode(e.target.id));
+                });
+
+                // Attribute selection
+                document.querySelectorAll('.attr-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.selectAttribute(e.currentTarget.dataset.attr));
+                });
+
+                // Modifier input
+                document.getElementById('modifier').addEventListener('input', (e) => {
+                    this.currentModifier = parseInt(e.target.value) || 0;
+                });
+
+                // Roll buttons
+                document.getElementById('rollAction').addEventListener('click', () => this.rollAction());
+                document.getElementById('rollDamage').addEventListener('click', () => this.rollDamage());
+                document.getElementById('rollCustom').addEventListener('click', () => this.rollCustom());
+
+                this.updateAttributeDisplay();
+            }
+
+            selectMode(modeId) {
+                document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(modeId).classList.add('active');
+                
+                switch(modeId) {
+                    case 'modeBuiltIn':
+                        this.currentMode = 'builtin';
+                        break;
+                    case 'modeOfficialDice':
+                        this.currentMode = 'official';
+                        break;
+                    case 'modeDDDice':
+                        this.currentMode = 'dddice';
+                        break;
+                }
+                
+                this.log(`Switched to ${this.currentMode} mode`, 'info');
+            }
+
+            selectAttribute(attr) {
+                document.querySelectorAll('.attr-btn').forEach(btn => btn.classList.remove('selected'));
+                document.querySelector(`[data-attr="${attr}"]`).classList.add('selected');
+                
+                this.selectedAttribute = attr;
+                this.selectedAttributeValue = this.attributes[attr];
+                
+                this.log(`Selected ${attr.toUpperCase()}: ${this.selectedAttributeValue >= 0 ? '+' : ''}${this.selectedAttributeValue}`, 'info');
+            }
+
+            updateAttributeDisplay() {
+                Object.entries(this.attributes).forEach(([attr, value]) => {
+                    const element = document.getElementById(attr.substring(0, 3) + 'Value');
+                    if (element) {
+                        element.textContent = `${value >= 0 ? '+' : ''}${value}`;
                     }
-                }
-            }
-
-            async waitForOBR() {
-                for (let i = 0; i < 20; i++) {
-                    if (typeof OBR !== 'undefined') return;
-                    await this.delay(250);
-                }
-            }
-
-            async timeout(ms, message) {
-                return new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error(message)), ms);
                 });
             }
 
-            async delay(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
+            changeTokens(type, amount) {
+                if (type === 'hope') {
+                    this.hopeTokens = Math.max(0, this.hopeTokens + amount);
+                    document.getElementById('hopeCount').textContent = this.hopeTokens;
+                } else {
+                    this.fearTokens = Math.max(0, this.fearTokens + amount);
+                    document.getElementById('fearCount').textContent = this.fearTokens;
+                }
+                
+                this.broadcastTokenUpdate();
+                this.log(`${type.charAt(0).toUpperCase() + type.slice(1)} tokens: ${type === 'hope' ? this.hopeTokens : this.fearTokens}`, 'info');
             }
 
-            enableTestMode() {
-                // Enable buttons for standalone testing
-                this.updateStatus('obrStatus', 'Test Mode', 'warning');
-                this.updateStatus('playerName', 'Test User', 'warning');
-                this.updateStatus('roomStatus', 'Test Mode', 'warning');
-                this.enableButtons();
-                this.log('Running in test mode - limited functionality', 'warning');
+            rollDie(sides) {
+                return Math.floor(Math.random() * sides) + 1;
             }
 
-            showSuccessMessage() {
-                document.getElementById('successMessage').style.display = 'block';
+            async rollAction() {
+                if (!this.selectedAttribute) {
+                    this.log('Please select an attribute first!', 'warning');
+                    return;
+                }
+
+                const die1 = this.rollDie(12);
+                const die2 = this.rollDie(12);
+                const attributeBonus = this.selectedAttributeValue;
+                const modifier = this.currentModifier;
+                const total = die1 + die2 + attributeBonus + modifier;
+
+                const rollData = {
+                    type: 'action',
+                    dice: [die1, die2],
+                    attribute: this.selectedAttribute,
+                    attributeBonus,
+                    modifier,
+                    total,
+                    timestamp: Date.now(),
+                    mode: this.currentMode
+                };
+
+                // Check for doubles (critical results)
+                if (die1 === die2) {
+                    if (die1 <= 6) {
+                        rollData.critical = 'failure';
+                        rollData.criticalValue = die1;
+                        this.changeTokens('fear', 1);
+                    } else {
+                        rollData.critical = 'success';
+                        rollData.criticalValue = die1;
+                        this.changeTokens('hope', 1);
+                    }
+                }
+
+                // Determine success level
+                if (total <= 9) {
+                    rollData.result = 'failure';
+                } else if (total <= 14) {
+                    rollData.result = 'partial';
+                } else {
+                    rollData.result = 'success';
+                }
+
+                await this.executeRoll(rollData);
             }
 
-            updateStatus(elementId, text, type = 'normal') {
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.textContent = text;
-                    element.className = `status-value status-${type}`;
+            async rollDamage() {
+                const d6 = this.rollDie(6);
+                const d12 = this.rollDie(12);
+
+                const rollData = {
+                    type: 'damage',
+                    d6,
+                    d12,
+                    timestamp: Date.now(),
+                    mode: this.currentMode
+                };
+
+                await this.executeRoll(rollData);
+            }
+
+            async rollCustom() {
+                const dice = prompt("Enter dice (e.g., '3d6', '2d10+5', '1d20'):");
+                if (!dice) return;
+
+                try {
+                    const result = this.parseAndRollDice(dice);
+                    const rollData = {
+                        type: 'custom',
+                        input: dice,
+                        rolls: result.rolls,
+                        modifier: result.modifier,
+                        total: result.total,
+                        timestamp: Date.now(),
+                        mode: this.currentMode
+                    };
+
+                    await this.executeRoll(rollData);
+                } catch (error) {
+                    this.log('Invalid dice format. Use format like "3d6+2"', 'error');
+                }
+            }
+
+            async executeRoll(rollData) {
+                // Add player info
+                rollData.playerName = this.playerInfo?.name || 'You';
+
+                // Execute based on current mode
+                switch (this.currentMode) {
+                    case 'builtin':
+                        await this.executeBuiltInRoll(rollData);
+                        break;
+                    case 'official':
+                        await this.executeOfficialDiceRoll(rollData);
+                        break;
+                    case 'dddice':
+                        await this.executeDDDiceRoll(rollData);
+                        break;
+                }
+
+                // Always process through Daggerheart mechanics
+                this.processRollResult(rollData);
+                
+                // Broadcast to other players
+                await this.broadcastRoll(rollData);
+            }
+
+            async executeBuiltInRoll(rollData) {
+                // Simple built-in rolling - already done in rollAction/rollDamage
+                this.log(`Built-in roll: ${this.formatRollData(rollData)}`, 'success');
+            }
+
+            async executeOfficialDiceRoll(rollData) {
+                // Try to communicate with official dice extension
+                if (this.integrations.officialDice) {
+                    // Send roll request to official dice
+                    this.log(`Sending to Official Dice: ${this.formatRollData(rollData)}`, 'info');
+                    // Implementation would depend on official dice extension API
+                } else {
+                    this.log('Official Dice extension not available, using built-in', 'warning');
+                    await this.executeBuiltInRoll(rollData);
+                }
+            }
+
+            async executeDDDiceRoll(rollData) {
+                // Try to communicate with dddice extension
+                if (this.integrations.dddice) {
+                    this.log(`Sending to dddice: ${this.formatRollData(rollData)}`, 'info');
+                    // Implementation would depend on dddice extension API
+                } else {
+                    this.log('dddice extension not available, using built-in', 'warning');
+                    await this.executeBuiltInRoll(rollData);
+                }
+            }
+
+            processRollResult(rollData) {
+                // Add to roll history
+                this.addToRollHistory(rollData);
+            }
+
+            addToRollHistory(rollData) {
+                const container = document.getElementById('rollResults');
+                const result = document.createElement('div');
+                result.className = 'roll-result roll-animate';
+
+                let html = `
+                    <div class="roll-header">
+                        <span class="player-name">${rollData.playerName}</span>
+                        <span class="roll-time">${new Date(rollData.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                `;
+
+                if (rollData.type === 'action') {
+                    html += `
+                        <div class="roll-details">
+                            <div class="dice-values">🎲 ${rollData.dice[0]} + ${rollData.dice[1]}</div>
+                            <div>Attribute (${rollData.attribute.toUpperCase()}): ${rollData.attributeBonus >= 0 ? '+' : ''}${rollData.attributeBonus}</div>
+                            ${rollData.modifier !== 0 ? `<div>Modifier: ${rollData.modifier >= 0 ? '+' : ''}${rollData.modifier}</div>` : ''}
+                            <div class="roll-total">Total: ${rollData.total}</div>
+                        </div>
+                        <div class="roll-outcome outcome-${rollData.result}">
+                            ${rollData.result === 'success' ? 'Full Success' : 
+                              rollData.result === 'partial' ? 'Partial Success' : 'Failure'}
+                        </div>
+                    `;
+                    
+                    if (rollData.critical) {
+                        html += `
+                            <div class="critical critical-${rollData.critical}">
+                                ${rollData.critical === 'success' ? '⭐ Critical Success!' : '💀 Critical Failure!'} 
+                                (Double ${rollData.criticalValue}s)
+                            </div>
+                        `;
+                    }
+                } else if (rollData.type === 'damage') {
+                    html += `
+                        <div class="roll-details">
+                            <div class="dice-values">⚔️ d6: ${rollData.d6} | d12: ${rollData.d12}</div>
+                        </div>
+                    `;
+                } else if (rollData.type === 'custom') {
+                    html += `
+                        <div class="roll-details">
+                            <div class="dice-values">🎲 ${rollData.input}: ${rollData.total}</div>
+                        </div>
+                    `;
+                }
+
+                result.innerHTML = html;
+                container.insertBefore(result, container.firstChild);
+
+                // Keep only last 10 results
+                while (container.children.length > 10) {
+                    container.removeChild(container.lastChild);
+                }
+            }
+
+            async checkIntegrations() {
+                // Check for official dice extension
+                try {
+                    // This is a placeholder - actual implementation would depend on extension APIs
+                    this.integrations.officialDice = false; // await this.checkOfficialDice();
+                    this.updateIntegrationStatus('officialDice', this.integrations.officialDice);
+                } catch (error) {
+                    this.integrations.officialDice = false;
+                    this.updateIntegrationStatus('officialDice', false);
+                }
+
+                // Check for dddice extension
+                try {
+                    this.integrations.dddice = false; // await this.checkDDDice();
+                    this.updateIntegrationStatus('dddice', this.integrations.dddice);
+                } catch (error) {
+                    this.integrations.dddice = false;
+                    this.updateIntegrationStatus('dddice', false);
+                }
+            }
+
+            updateIntegrationStatus(integration, status) {
+                const statusIndicator = document.getElementById(`status${integration.charAt(0).toUpperCase() + integration.slice(1)}`);
+                const statusText = document.getElementById(`text${integration.charAt(0).toUpperCase() + integration.slice(1)}`);
+                
+                if (statusIndicator && statusText) {
+                    statusIndicator.className = `status-indicator ${status ? 'status-online' : 'status-offline'}`;
+                    statusText.textContent = status ? 'Available' : 'Not Found';
+                }
+            }
+
+            formatRollData(rollData) {
+                if (rollData.type === 'action') {
+                    return `2d12: ${rollData.dice[0]} + ${rollData.dice[1]} = ${rollData.total}`;
+                } else if (rollData.type === 'damage') {
+                    return `Damage: d6(${rollData.d6}) + d12(${rollData.d12})`;
+                } else {
+                    return `${rollData.input}: ${rollData.total}`;
+                }
+            }
+
+            parseAndRollDice(diceString) {
+                const match = diceString.match(/(\d+)?d(\d+)([+-]\d+)?/i);
+                if (!match) throw new Error("Invalid format");
+                
+                const numDice = parseInt(match[1]) || 1;
+                const sides = parseInt(match[2]);
+                const modifier = parseInt(match[3]) || 0;
+                
+                let total = 0;
+                let rolls = [];
+                
+                for (let i = 0; i < numDice; i++) {
+                    const roll = this.rollDie(sides);
+                    rolls.push(roll);
+                    total += roll;
+                }
+                
+                total += modifier;
+                
+                return { numDice, sides, modifier, rolls, total };
+            }
+
+            async broadcastRoll(rollData) {
+                if (this.broadcastChannel) {
+                    await this.broadcastChannel.sendMessage({
+                        type: 'DAGGERHEART_ROLL',
+                        data: rollData,
+                        playerName: rollData.playerName
+                    });
+                }
+            }
+
+            async broadcastTokenUpdate() {
+                if (this.broadcastChannel) {
+                    await this.broadcastChannel.sendMessage({
+                        type: 'DAGGERHEART_TOKENS',
+                        data: {
+                            hope: this.hopeTokens,
+                            fear: this.fearTokens
+                        },
+                        playerName: this.playerInfo?.name || 'Unknown'
+                    });
+                }
+            }
+
+            handleIncomingMessage(message) {
+                if (message.type === 'DAGGERHEART_ROLL') {
+                    this.processRollResult(message.data);
+                    this.log(`📨 Roll from ${message.playerName}`, 'info');
+                } else if (message.type === 'DAGGERHEART_TOKENS') {
+                    // Could sync tokens across players if desired
+                    this.log(`📨 Token update from ${message.playerName}`, 'info');
                 }
             }
 
             log(message, type = 'info') {
-                const logEntries = document.getElementById('logEntries');
-                const time = new Date().toLocaleTimeString();
-                
-                const entry = document.createElement('div');
-                entry.className = 'log-entry';
-                
-                let color = '#e6d3b7';
-                if (type === 'success') color = '#90EE90';
-                if (type === 'error') color = '#FF6B6B';
-                if (type === 'warning') color = '#ffd700';
-                if (type === 'info') color = '#4a90e2';
-                
-                entry.innerHTML = `
-                    <span class="log-time">[${time}]</span> 
-                    <span style="color: ${color}">${message}</span>
-                `;
-                
-                logEntries.insertBefore(entry, logEntries.firstChild);
-                
-                // Keep only last 15 entries
-                while (logEntries.children.length > 15) {
-                    logEntries.removeChild(logEntries.lastChild);
-                }
+                const colors = {
+                    info: '#4a90e2',
+                    success: '#90EE90',
+                    warning: '#ffd700',
+                    error: '#FF6B6B'
+                };
                 
                 console.log(`[Daggerheart] ${message}`);
-            }
-
-            enableButtons() {
-                document.getElementById('testNotification').disabled = false;
-                document.getElementById('testBroadcast').disabled = false;
-                document.getElementById('testMetadata').disabled = false;
-            }
-
-            async testNotification() {
-                try {
-                    if (this.isReady && typeof OBR !== 'undefined') {
-                        await OBR.notification.show('🎲 Daggerheart Test', 'Extension working correctly!', 'SUCCESS');
-                        this.log('✅ Notification sent successfully', 'success');
-                    } else {
-                        this.log('📱 Test notification (would show in OBR)', 'info');
-                    }
-                } catch (error) {
-                    this.log(`❌ Notification error: ${error.message}`, 'error');
-                }
-            }
-
-            async testBroadcast() {
-                try {
-                    if (this.isReady && this.broadcastChannel) {
-                        await this.broadcastChannel.sendMessage({
-                            playerName: this.playerInfo.name,
-                            data: {
-                                text: 'Hello from Daggerheart extension!',
-                                timestamp: Date.now()
-                            }
-                        });
-                        this.log('📡 Message broadcast sent', 'success');
-                    } else {
-                        this.log('📡 Test broadcast (would send to other players)', 'info');
-                    }
-                } catch (error) {
-                    this.log(`❌ Broadcast error: ${error.message}`, 'error');
-                }
-            }
-
-            async testMetadata() {
-                try {
-                    if (this.isReady && typeof OBR !== 'undefined') {
-                        const testData = {
-                            version: '1.0.0',
-                            initialized: true,
-                            timestamp: Date.now()
-                        };
-                        
-                        await OBR.room.setMetadata('daggerheart-test', testData);
-                        const retrieved = await OBR.room.getMetadata('daggerheart-test');
-                        
-                        this.log(`💾 Data saved and retrieved: v${retrieved.version}`, 'success');
-                    } else {
-                        this.log('💾 Test save data (would save to room)', 'info');
-                    }
-                } catch (error) {
-                    this.log(`❌ Metadata error: ${error.message}`, 'error');
-                }
-            }
-
-            clearLog() {
-                const logEntries = document.getElementById('logEntries');
-                logEntries.innerHTML = '<div class="log-entry"><span class="log-time">[Cleared]</span> <span style="color: #4a90e2">Log cleared</span></div>';
+                
+                // Could add to UI log if desired
             }
         }
 
-        // Initialize extension
-        let daggerheartExt;
+        // Initialize the extension
+        let daggerheartDice;
         
-        // Start initialization when DOM is ready
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeExtension);
+            document.addEventListener('DOMContentLoaded', () => {
+                daggerheartDice = new DaggerheartHybridDice();
+            });
         } else {
-            initializeExtension();
-        }
-
-        function initializeExtension() {
-            daggerheartExt = new DaggerheartExtension();
-            setupEventListeners();
-        }
-
-        function setupEventListeners() {
-            document.getElementById('testNotification')?.addEventListener('click', () => {
-                daggerheartExt?.testNotification();
-            });
-            
-            document.getElementById('testBroadcast')?.addEventListener('click', () => {
-                daggerheartExt?.testBroadcast();
-            });
-            
-            document.getElementById('testMetadata')?.addEventListener('click', () => {
-                daggerheartExt?.testMetadata();
-            });
-            
-            document.getElementById('clearLog')?.addEventListener('click', () => {
-                daggerheartExt?.clearLog();
-            });
-        }
-
-        // Load OBR SDK dynamically if not loaded
-        if (typeof OBR === 'undefined') {
-            const script = document.createElement('script');
-            script.src = 'https://sdk.owlbear.rodeo/1.0.0/obr.js';
-            script.async = true;
-            document.head.appendChild(script);
+            daggerheartDice = new DaggerheartHybridDice();
         }
     </script>
 </body>
